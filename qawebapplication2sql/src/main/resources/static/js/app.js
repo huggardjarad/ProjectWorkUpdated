@@ -41,6 +41,7 @@ var Employee = React.createClass({
             }
         });
     },
+
     render: function() {
         if (!this.state.delete) return (
             <tr>
@@ -51,12 +52,157 @@ var Employee = React.createClass({
             <td>
             <button type="submit" className="btn btn-primary" id = "employeeDelete" onClick={this.handleDelete}>Delete</button>
             </td>
+             <td>
+                 <EditTable employee={this.props.employee}/>
+             </td>
             </tr>
              );
         else return null;
 
     }
+
 });
+
+var EditTable = React.createClass({
+    getInitialState: function() {
+        return {
+            firstName: this.props.employee.firstName,
+            lastName: this.props.employee.lastName,
+            email: this.props.employee.email,
+            password: this.props.employee.password
+        }
+    },
+    renderUpdates: function(){
+
+        ReactDOM.render(
+            <DashBoard />, document.getElementById('accounts')
+        );
+
+        ReactDOM.render(
+            <DatabaseAccounts />, document.getElementById('accounts')
+        )
+    },
+    componentWillMount:function() {
+        const id = "modal-" + this.props.employee.id;
+        this.setState({id: id, dataTarget : "#" + id})
+    },
+
+    render: function() {
+        return(
+            <div>
+            <button type="button" className="btn btn-primary" data-toggle="modal" data-target={this.state.dataTarget}>
+                Edit
+            </button>
+
+
+            <div className="modal fade" id={this.state.id} tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div className="modal-dialog" role="document">
+            <div className="modal-content">
+            <div className="modal-header">
+            <h5 className="modal-title" id="exampleModalLabel">Edit</h5>
+        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div className="modal-body">
+            <EditForm employee={this.props.employee} onClick={this.props.onClick}/>
+        </div>
+        <div className="modal-footer">
+            <button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={this.renderUpdates}>Close</button>
+        </div>
+    </div>
+    </div>
+    </div>
+            </div>
+        )}
+    });
+var EditForm = React.createClass({
+    getInitialState: function(){
+        return {
+            firstName: this.props.employee.firstName,
+            lastName: this.props.employee.lastName,
+            email: this.props.employee.email,
+            password: this.props.employee.password
+    }
+    },
+    fNameEdit: function(f) {
+        this.setState({ firstName: f.target.value})
+    },
+    lNameEdit: function(f) {
+        this.setState({lastName: f.target.value})
+    },
+    emailEdit: function(f) {
+        this.setState({email: f.target.value})
+    },
+    pWordEdit: function(f) {
+        this.setState({password: f.target.value})
+    },
+
+    submitEdit: function(f) {
+        var self= this;
+        f.preventDefault();
+        const data = {
+            "id": this.props.employee.id,
+            "firstName": this.state.firstName,
+            "lastName": this.state.lastName,
+            "email": this.state.email,
+            "password": this.state.password
+        };
+        if(typeof this.props.employee.id !== "undefined") data.id = this.props.employee.id;
+        const jsonData = JSON.stringify(data);
+        console.log(jsonData);
+
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "http://localhost:8080/app/add",
+            "method": "POST",
+            "headers": {
+                "content-type": "application/json",
+                "cache-control": "no-cache",
+                "postman-token": "31466fbf-961e-d87f-5591-08e1b963cb8b"
+            },
+            "processData": false,
+            "data": jsonData
+        };
+
+        $.ajax(settings).done(function (response) {
+            console.log(response);
+        });
+    },
+    render: function() {
+        return (
+            <div className= "container">
+            <form onSubmit={this.submitEdit}>
+                <div className="form-group">
+                    <label htmlFor="fNameInput">First Name:</label>
+                    <input type="text" className="editform-control" placeholder="Edit First Name" onChange={this.fNameEdit} value={this.state.firstName} defaultValue={this.props.employee.firstName} />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="lNameInput">Last Name:</label>
+                    <input type="text" className="editform-control" placeholder="Edit Last Name" onChange={this.lNameEdit} value={this.state.lastName} defaultValue={this.props.employee.lastName} />
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="inputEmail">Email address:</label>
+                    <input type="email" className="editform-control" aria-describedby="emailHelp" placeholder="Edit Enter email" onChange={this.emailEdit} value={this.state.email} defaultValue={this.props.employee.email}/>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="inputPassword">Password:</label>
+                    <input type="password" className="editform-control" placeholder="Edit Password" onChange={this.pWordEdit} value={this.state.password} defaultValue={this.props.employee.password}/>
+                </div>
+                <div>
+                <button type="submit" className="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+            </div>
+
+        )
+        }
+        });
+
+
 var EmployeeTable = React.createClass({
     render: function() {
         var rows = [];
@@ -200,13 +346,13 @@ var AddAccountForm = React.createClass({
         <input type="password" className="form-control" id="inputPassword1" placeholder="Password" onChange={this.pWordChange}></input>
         </div>
 
-        <button type="submit" className="btn btn-primary">Add Account</button>
+        <button type="submit" class
+                Name="btn btn-primary">Add Account</button>
         </form>
 
     )
     }
 });
-
 
 function handleClick(e){
     e.preventDefault();

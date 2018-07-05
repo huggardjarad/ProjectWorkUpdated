@@ -15,10 +15,10 @@ public class Employee {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
-    private String firstName;
     private String lastName;
     private String email;
     private String password;
+    private String firstName;
 
 
     public Employee(String firstName, String lastName, String email, String password) {
